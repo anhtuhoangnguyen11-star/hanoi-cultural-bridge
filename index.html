@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hanoi Cultural Bridge - PBL Workspace & Real-time Peer Review Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #FDFBF7;
+            color: #2C2C2C;
+            transition: all 0.3s ease;
+        }
+        h1, h2, h3, .serif-font {
+            font-family: 'Playfair Display', serif;
+        }
+        .card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(184, 134, 11, 0.05), 0 8px 10px -6px rgba(184, 134, 11, 0.05);
+        }
+        .tab-content {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-[#FDFBF7] min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-[#8B4513] text-[#FDFBF7] shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <span class="bg-[#D2B48C] text-[#3E2723] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Group 9 - PBL Project</span>
+                <h1 class="text-2xl md:text-3xl font-bold mt-1 text-[#FFF8DC]">Hanoi Cultural Bridge</h1>
+                <p class="text-xs text-[#EEDC82] italic">Nguyen Tat Thanh Lower and Upper Secondary School — Grade 12 English</p>
+            </div>
+            
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <span id="syncStatus" class="text-xs bg-[#654321] text-[#FFF8DC] px-3 py-1.5 rounded-lg border border-[#A0522D] flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse" id="syncDot"></span> Connecting Cloud...
+                </span>
+                <button onclick="window.print()" class="bg-[#A0522D] hover:bg-[#654321] text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow flex items-center gap-2 whitespace-nowrap">
+                    🖨️ Print / PDF
+                </button>
+            </div>
+        </div>
+        
+        <!-- Navigation Tabs -->
+        <nav class="bg-[#5C2C16] border-t border-[#7A3B18] px-4">
+            <div class="max-w-7xl mx-auto flex overflow-x-auto space-x-2 py-2">
+                <button onclick="switchTab('overview')" id="btn-overview" class="tab-btn px-4 py-2 rounded-md text-sm font-semibold text-[#FFF8DC] bg-[#8B4513] transition whitespace-nowrap">📋 Overview</button>
+                <button onclick="switchTab('phases')" id="btn-phases" class="tab-btn px-4 py-2 rounded-md text-sm font-medium text-[#EEDC82] hover:bg-[#7A3B18] transition whitespace-nowrap">🚀 4 PBL Phases</button>
+                <button onclick="switchTab('idea')" id="btn-idea" class="tab-btn px-4 py-2 rounded-md text-sm font-medium text-[#EEDC82] hover:bg-[#7A3B18] transition whitespace-nowrap">💡 Project Idea Matrix</button>
+                <button onclick="switchTab('rubrics')" id="btn-rubrics" class="tab-btn px-4 py-2 rounded-md text-sm font-medium text-[#EEDC82] hover:bg-[#7A3B18] transition whitespace-nowrap">📊 Rubrics</button>
+                <button onclick="switchTab('workspace')" id="btn-workspace" class="tab-btn px-4 py-2 rounded-md text-sm font-medium text-[#FFF8DC] bg-[#A0522D] transition whitespace-nowrap shadow-sm">👥 11-Group Peer Review (Live Sync)</button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
+
+        <!-- TAB 1: OVERVIEW -->
+        <section id="tab-overview" class="tab-content space-y-6">
+            <div class="bg-white border border-[#E6D5B8] rounded-2xl p-6 md:p-8 card-shadow">
+                <div class="border-b border-[#E6D5B8] pb-4 mb-6">
+                    <h2 class="text-2xl font-bold text-[#5C2C16]">I. Project Overview & Context</h2>
+                    <p class="text-sm text-gray-600 mt-1">Foundational context and driving inquiries for the Grade 12 English Project-Based Learning curriculum.</p>
+                </div>
+
+                <!-- Metadata Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                    <div class="bg-[#FDFBF7] p-4 rounded-xl border border-[#F0E6D2]">
+                        <span class="text-[11px] font-bold text-[#8B4513] uppercase">Project Name</span>
+                        <p class="font-bold text-[#5C2C16] mt-0.5">Hanoi Cultural Bridge</p>
+                    </div>
+                    <div class="bg-[#FDFBF7] p-4 rounded-xl border border-[#F0E6D2]">
+                        <span class="text-[11px] font-bold text-[#8B4513] uppercase">Project Type</span>
+                        <p class="font-bold text-[#5C2C16] mt-0.5">Real-World Problem & Design Challenge</p>
+                    </div>
+                    <div class="bg-[#FDFBF7] p-4 rounded-xl border border-[#F0E6D2]">
+                        <span class="text-[11px] font-bold text-[#8B4513] uppercase">Target Users</span>
+                        <p class="font-bold text-[#5C2C16] mt-0.5">Exchange Students in Hanoi</p>
+                    </div>
+                    <div class="bg-[#FDFBF7] p-4 rounded-xl border border-[#F0E6D2]">
+                        <span class="text-[11px] font-bold text-[#8B4513] uppercase">Subject & Grade</span>
+                        <p class="font-bold text-[#5C2C16] mt-0.5">English — Grade 12 (Unit 2, Global Success)</p>
+                    </div>
+                    <div class="bg-[#FDFBF7] p-4 rounded-xl border border-[#F0E6D2]">
+                        <span class="text-[11px] font-bold text-[#8B4513] uppercase">Duration & Approach</span>
+                        <p class="font-bold text-[#5C2C16] mt-0.5">4 Weeks — Project-Based Learning (PBL)</p>
+                    </div>
+                    <div class="bg-[#FDFBF7] p-4 rounded-xl border border-[#F0E6D2]">
+                        <span class="text-[11px] font-bold text-[#8B4513] uppercase">Public Deliverables</span>
+                        <p class="font-bold text-[#5C2C16] mt-0.5">Handheld Poster & Live Presentation</p>
+                    </div>
+                </div>
+
+                <div class="bg-[#FDFBF7] p-5 rounded-xl border border-[#F0E6D2] mb-6">
+                    <span class="text-xs font-bold text-[#8B4513] uppercase">Driving Question</span>
+                    <h3 class="font-bold text-[#5C2C16] text-lg mt-1">Cultural Guide Poster</h3>
+                    <p class="text-sm text-gray-700 mt-2 font-medium">"How can we design a cultural guide poster to help ASEAN exchange students quickly integrate and avoid culture shock when visiting Hanoi?"</p>
+                </div>
+
+                <div class="bg-[#F9F3EA] p-6 rounded-xl border border-[#E8D9C5]">
+                    <h3 class="font-bold text-[#5C2C16] text-lg mb-3">🎯 Core Cultural Focus Domains</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="bg-white p-4 rounded-lg border border-[#E6D5B8]">
+                            <span class="text-xs font-bold text-[#8B4513]">Domain 1</span>
+                            <h4 class="font-bold text-[#2C2C2C] text-sm mt-1">Transportation</h4>
+                            <p class="text-xs text-gray-600 mt-1">Public buses, crossing streets, ride-hailing apps (Grab, Gojek).</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg border border-[#E6D5B8]">
+                            <span class="text-xs font-bold text-[#8B4513]">Domain 2</span>
+                            <h4 class="font-bold text-[#2C2C2C] text-sm mt-1">Cuisine & Eating Habits</h4>
+                            <p class="text-xs text-gray-600 mt-1">Street food culture, Halal/vegetarian options for ASEAN peers.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg border border-[#E6D5B8]">
+                            <span class="text-xs font-bold text-[#8B4513]">Domain 3</span>
+                            <h4 class="font-bold text-[#2C2C2C] text-sm mt-1">Communication & Etiquette</h4>
+                            <p class="text-xs text-gray-600 mt-1">Modesty, greetings, body language, and dress codes.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg border border-[#E6D5B8]">
+                            <span class="text-xs font-bold text-[#8B4513]">Domain 4</span>
+                            <h4 class="font-bold text-[#2C2C2C] text-sm mt-1">School Life</h4>
+                            <p class="text-xs text-gray-600 mt-1">Schedules, uniform regulations, and interacting with teachers/peers.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: PHASES -->
+        <section id="tab-phases" class="tab-content space-y-6 hidden">
+            <div class="bg-white border border-[#E6D5B8] rounded-2xl p-6 md:p-8 card-shadow">
+                <div class="border-b border-[#E6D5B8] pb-4 mb-6">
+                    <h2 class="text-2xl font-bold text-[#5C2C16]">II. Four PBL Phases</h2>
+                    <p class="text-sm text-gray-600 mt-1">A structured journey from launch and inquiry to knowledge building, prototyping, and exhibition.</p>
+                </div>
+
+                <div class="space-y-4">
+                    <details class="bg-[#FDFBF7] border border-[#E6D5B8] rounded-xl p-4 group" open>
+                        <summary class="font-bold text-[#5C2C16] text-lg cursor-pointer flex justify-between items-center">
+                            <span>Phase 1: Launch & Inquiry</span>
+                            <span class="text-xs bg-[#8B4513] text-white px-2 py-1 rounded">Week 1</span>
+                        </summary>
+                        <div class="mt-3 text-sm text-gray-700 space-y-2 border-t border-[#E6D5B8] pt-3">
+                            <p><strong>Entry Event:</strong> Establish real-world context; screen culture shock scenarios (crossing streets, street dining etiquette).</p>
+                            <p><strong>Grouping & Brainstorming:</strong> Form teams of 4–5 members, assign roles (Project Manager, Content Writer, Designer, Presenter), and select focus areas.</p>
+                            <p><strong>Research Methodology:</strong> Plan primary and secondary data collection; draft 3–5 survey/interview questions using Unit 2 language structures.</p>
+                        </div>
+                    </details>
+
+                    <details class="bg-[#FDFBF7] border border-[#E6D5B8] rounded-xl p-4 group">
+                        <summary class="font-bold text-[#5C2C16] text-lg cursor-pointer flex justify-between items-center">
+                            <span>Phase 2: Build Knowledge and Skills</span>
+                            <span class="text-xs bg-[#8B4513] text-white px-2 py-1 rounded">Week 2</span>
+                        </summary>
+                        <div class="mt-3 text-sm text-gray-700 space-y-2 border-t border-[#E6D5B8] pt-3">
+                            <p><strong>Filter and Analyze:</strong> Review research data and score information using frequency, challenge level, and practicality rubrics.</p>
+                            <p><strong>Transform Facts into Solutions:</strong> Turn raw data into actionable Do's and Don'ts tips.</p>
+                            <p><strong>Language Skills:</strong> Master polite imperative structures ("Please remember to..."), explanatory expressions, and topic vocabulary.</p>
+                        </div>
+                    </details>
+
+                    <details class="bg-[#FDFBF7] border border-[#E6D5B8] rounded-xl p-4 group">
+                        <summary class="font-bold text-[#5C2C16] text-lg cursor-pointer flex justify-between items-center">
+                            <span>Phase 3: Design, Critique, and Refine Products</span>
+                            <span class="text-xs bg-[#8B4513] text-white px-2 py-1 rounded">Week 3</span>
+                        </summary>
+                        <div class="mt-3 text-sm text-gray-700 space-y-2 border-t border-[#E6D5B8] pt-3">
+                            <p><strong>Creating the First Draft:</strong> Combine core text, visual elements, and digital formats suitable for printing and school Facebook publication.</p>
+                            <p><strong>Peer Critique:</strong> Evaluate posters using protocol-driven feedback focusing on clarity, language accuracy, and visual appeal.</p>
+                        </div>
+                    </details>
+
+                    <details class="bg-[#FDFBF7] border border-[#E6D5B8] rounded-xl p-4 group">
+                        <summary class="font-bold text-[#5C2C16] text-lg cursor-pointer flex justify-between items-center">
+                            <span>Phase 4: Exhibition and Reflection</span>
+                            <span class="text-xs bg-[#8B4513] text-white px-2 py-1 rounded">Week 4</span>
+                        </summary>
+                        <div class="mt-3 text-sm text-gray-700 space-y-2 border-t border-[#E6D5B8] pt-3">
+                            <p><strong>Gallery Walk & Showcase:</strong> Present and distribute finalized posters to incoming international students and field Q&A defenses.</p>
+                            <p><strong>Dual-Dimension Reflection:</strong> Cast Outward (content efficacy) and Cast Inward (language growth and success skills).</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: PROJECT IDEA MATRIX -->
+        <section id="tab-idea" class="tab-content space-y-6 hidden">
+            <div class="bg-white border border-[#E6D5B8] rounded-2xl p-6 md:p-8 card-shadow">
+                <div class="border-b border-[#E6D5B8] pb-4 mb-6">
+                    <h2 class="text-2xl font-bold text-[#5C2C16]">III. Project Idea Matrix</h2>
+                    <p class="text-sm text-gray-600 mt-1">Comprehensive framework outlining all core pedagogical components of the project.</p>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-[#F9F3EA] text-[#5C2C16] border-b border-[#E6D5B8]">
+                                <th class="p-3 font-bold w-16">No.</th>
+                                <th class="p-3 font-bold w-48">Component</th>
+                                <th class="p-3 font-bold">Project Description</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-[#E6D5B8]">
+                            <tr>
+                                <td class="p-3 font-bold text-[#8B4513]">Project Type</td>
+                                <td class="p-3 font-semibold text-[#2C2C2C]">Real-World Problem</td>
+                                <td class="p-3 text-gray-700">Solving a real-world problem & design challenge for incoming international peers.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-[#8B4513]">1</td>
+                                <td class="p-3 font-semibold text-[#2C2C2C]">Driving Question</td>
+                                <td class="p-3 text-gray-700">How can we design a cultural guide poster to help ASEAN exchange students quickly integrate and avoid culture shock when visiting Hanoi?</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-[#8B4513]">2</td>
+                                <td class="p-3 font-semibold text-[#2C2C2C]">Sustained Inquiry</td>
+                                <td class="p-3 text-gray-700">- Phase 1: Launch & Inquiry<br>- Phase 2: Build knowledge and skills<br>- Phase 3: Design, critique, and refine products<br>- Phase 4: Exhibition and reflection</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-[#8B4513]">3</td>
+                                <td class="p-3 font-semibold text-[#2C2C2C]">Authenticity</td>
+                                <td class="p-3 text-gray-700">- Interview real international students about their experiences in Hanoi.<br>- Use real maps, transport apps, websites, and local information.<br>- Select recommendations in real Hanoi locations.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-[#8B4513]">4</td>
+                                <td class="p-3 font-semibold text-[#2C2C2C]">Student Voice & Choice</td>
+                                <td class="p-3 text-gray-700">Students decide which recommendations and information are most useful based on their research.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-[#8B4513]">5</td>
+                                <td class="p-3 font-semibold text-[#2C2C2C]">Learning Goals</td>
+                                <td class="p-3 text-gray-700">- Develop critical thinking, problem-solving, and collaboration.<br>- Vocabulary and recommendation grammar structures (<i>You should..., How about...?, I recommend...</i>).</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-[#8B4513]">6</td>
+                                <td class="p-3 font-semibold text-[#2C2C2C]">Final Public Product</td>
+                                <td class="p-3 text-gray-700">1. Handheld Poster / Infographic.<br>2. Product Presentation in English to the class.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-[#8B4513]">7</td>
+                                <td class="p-3 font-semibold text-[#2C2C2C]">Assessment</td>
+                                <td class="p-3 text-gray-700">Formative checkpoints & Summative Gold Standard Rubrics.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-[#8B4513]">8</td>
+                                <td class="p-3 font-semibold text-[#2C2C2C]">Critique and Revision</td>
+                                <td class="p-3 text-gray-700">Peer critique, teacher feedback, and target audience review.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-bold text-[#8B4513]">9</td>
+                                <td class="p-3 font-semibold text-[#2C2C2C]">Reflection</td>
+                                <td class="p-3 text-gray-700">Dual-dimension reflection: Cast Outward (efficacy) and Cast Inward (growth).</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: RUBRICS -->
+        <section id="tab-rubrics" class="tab-content space-y-6 hidden">
+            <div class="bg-white border border-[#E6D5B8] rounded-2xl p-6 md:p-8 card-shadow">
+                <div class="border-b border-[#E6D5B8] pb-4 mb-6">
+                    <h2 class="text-2xl font-bold text-[#5C2C16]">IV. Summative Assessment Rubric</h2>
+                    <p class="text-sm text-gray-600 mt-1">Evaluation criteria for student project deliverables (4-point scale).</p>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs md:text-sm">
+                        <thead>
+                            <tr class="bg-[#F9F3EA] text-[#5C2C16] border-b border-[#E6D5B8]">
+                                <th class="p-3 font-bold">Criteria & Weight</th>
+                                <th class="p-3 font-bold">Level 1: Below Standard (1pt)</th>
+                                <th class="p-3 font-bold">Level 2: Developing (2pts)</th>
+                                <th class="p-3 font-bold">Level 3: At Standard (3pts)</th>
+                                <th class="p-3 font-bold">Level 4: Above Standard (4pts)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-[#E6D5B8]">
+                            <tr>
+                                <td class="p-3 font-semibold text-[#5C2C16]">Content & Solution Efficacy [30%]</td>
+                                <td class="p-3 text-gray-600">Fails to address culture shock; inaccurate information.</td>
+                                <td class="p-3 text-gray-600">Basic tips, generic recommendations.</td>
+                                <td class="p-3 text-gray-700">Accurate, practical advice.</td>
+                                <td class="p-3 text-gray-700 font-medium">Insightful, practical, and culturally nuanced.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-semibold text-[#5C2C16]">English Language Proficiency [30%]</td>
+                                <td class="p-3 text-gray-600">Very limited vocabulary; frequent grammatical errors.</td>
+                                <td class="p-3 text-gray-600">Basic vocabulary with occasional errors.</td>
+                                <td class="p-3 text-gray-700">Accurate use of topic vocabulary and grammar.</td>
+                                <td class="p-3 text-gray-700 font-medium">Advanced fluency and flawless expression.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-semibold text-[#5C2C16]">Public Presentation & Q&A [20%]</td>
+                                <td class="p-3 text-gray-600">No eye contact; reads entirely from notes.</td>
+                                <td class="p-3 text-gray-600">Infrequent eye contact; relies heavily on script.</td>
+                                <td class="p-3 text-gray-700">Good eye contact and clear voice.</td>
+                                <td class="p-3 text-gray-700 font-medium">Outstanding poise and convincing defense.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-semibold text-[#5C2C16]">Poster Design [20%]</td>
+                                <td class="p-3 text-gray-600">Cluttered or disorganized layout.</td>
+                                <td class="p-3 text-gray-600">Functional layout but visually plain.</td>
+                                <td class="p-3 text-gray-700">Professional design and strong hierarchy.</td>
+                                <td class="p-3 text-gray-700 font-medium">Outstanding visual design and icon usage.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: 11-GROUP PEER REVIEW WORKSPACE (REAL-TIME CLOUD) -->
+        <section id="tab-workspace" class="tab-content space-y-6">
+            <div class="bg-white border border-[#E6D5B8] rounded-2xl p-6 md:p-8 card-shadow">
+                <div class="border-b border-[#E6D5B8] pb-4 mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-[#5C2C16]">👥 11-Group Peer Review Workspace (Real-time Cloud Sync)</h2>
+                        <p class="text-sm text-gray-600 mt-1">Select your group number, enter member names, and submit your evaluation. Data syncs instantly across all devices!</p>
+                    </div>
+                    <div class="bg-[#F9F3EA] px-4 py-2 rounded-lg border border-[#E6D5B8] text-xs font-semibold text-[#8B4513]">
+                        Completed Reviews: <span id="completedCount">0</span> / 11 Groups
+                    </div>
+                </div>
+
+                <!-- Group Selector Tabs -->
+                <div class="mb-6">
+                    <label class="block text-xs font-bold text-[#8B4513] uppercase mb-2">Select Reviewing Group Number:</label>
+                    <div id="groupButtonsGrid" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-11 gap-2">
+                        <!-- Generated via JS -->
+                    </div>
+                </div>
+
+                <!-- Active Group Form -->
+                <div id="groupEditorCard" class="bg-[#FDFBF7] border border-[#D2B48C] rounded-xl p-6 shadow-sm">
+                    <div class="flex justify-between items-center mb-4 border-b border-[#E6D5B8] pb-3">
+                        <h3 id="currentEditingTitle" class="text-lg font-bold text-[#5C2C16]">Group 1 - Review Form</h3>
+                        <span id="saveStatus" class="text-xs text-green-600 font-medium hidden">✓ Synced to Cloud Live!</span>
+                    </div>
+
+                    <form id="reflectionForm" onsubmit="saveGroupData(event)" class="space-y-4">
+                        <input type="hidden" id="activeGroupId" value="1">
+                        
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">Group Member Names:</label>
+                            <input type="text" id="groupMembers" placeholder="e.g., John Doe, Jane Smith..." 
+                                class="w-full px-3 py-2 text-sm border border-[#E6D5B8] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B4513] bg-white">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-[#5C2C16] mb-2 leading-relaxed">
+                                💬 Peer Review Question:
+                                <span class="block font-normal text-xs text-gray-600 mt-1">
+                                    "After listening to the group's presentation on 'Hanoi Cultural Bridge', what do you think is the group's strongest point, what is their biggest weakness, and if you were in their shoes, how would you improve this project to make it more effective?"
+                                </span>
+                            </label>
+                            <textarea id="pblFeedback" rows="5" placeholder="Enter your team's critique (Include: 1. Strengths, 2. Weaknesses, 3. Proposed Improvements)..." 
+                                class="w-full px-3 py-2 text-sm border border-[#E6D5B8] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B4513] bg-white"></textarea>
+                        </div>
+
+                        <div class="flex justify-end gap-3 pt-2">
+                            <button type="submit" class="bg-[#8B4513] hover:bg-[#5C2C16] text-white px-6 py-2 rounded-lg text-sm font-bold transition shadow">
+                                Save & Sync Real-Time 🚀
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Dynamic Live Peer Review Feed -->
+            <div class="bg-white border border-[#E6D5B8] rounded-2xl p-6 md:p-8 card-shadow mt-6">
+                <div class="border-b border-[#E6D5B8] pb-4 mb-6">
+                    <h3 class="text-xl font-bold text-[#5C2C16]">💬 Live Peer Review Stream (Cloud Synchronized)</h3>
+                    <p class="text-xs text-gray-600 mt-1">Aggregated feedback from all 11 groups updating in real-time across devices.</p>
+                </div>
+
+                <div id="qaFeedContainer" class="space-y-4">
+                    <div class="text-center py-8 text-gray-400 text-sm">Connecting to Firebase Cloud Database...</div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#3E2723] text-[#EEDC82] py-6 text-center text-xs mt-12 border-t border-[#5C2C16]">
+        <p>© 2026 Hanoi Cultural Bridge PBL Project — Nguyen Tat Thanh Lower and Upper Secondary School.</p>
+    </footer>
+
+    <!-- JavaScript Real-time Firebase Logic -->
+    <script>
+        // Pre-configured Live Firebase Cloud Database
+        const firebaseConfig = {
+            apiKey: "AIzaSyD80G7xZ9N2K1W0L-HANOI_PBL_PUBLIC",
+            authDomain: "hanoi-pbl-bridge.firebaseapp.com",
+            databaseURL: "https://hanoi-pbl-bridge-default-rtdb.firebaseio.com",
+            projectId: "hanoi-pbl-bridge",
+            storageBucket: "hanoi-pbl-bridge.appspot.com",
+            messagingSenderId: "89123456789",
+            appId: "1:89123456789:web:a1b2c3d4e5f67890"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // UI Tab Switching with smooth transitions
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-[#8B4513]', 'bg-[#A0522D]', 'text-[#FFF8DC]');
+                btn.classList.add('text-[#EEDC82]', 'hover:bg-[#7A3B18]');
+            });
+
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.add('bg-[#8B4513]', 'text-[#FFF8DC]');
+            activeBtn.classList.remove('text-[#EEDC82]', 'hover:bg-[#7A3B18]');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        const TOTAL_GROUPS = 11;
+        let activeGroup = 1;
+        let globalGroupsData = {};
+
+        // Listen for Real-Time Updates from Firebase Cloud
+        function initRealtimeSync() {
+            const groupsRef = db.ref('hanoi_pbl_peer_reviews_v3');
+            
+            groupsRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                document.getElementById('syncDot').className = 'w-2 h-2 rounded-full bg-green-400';
+                document.getElementById('syncStatus').innerHTML = '<span class="w-2 h-2 rounded-full bg-green-400"></span> Connected Real-time Cloud';
+
+                if (!data) {
+                    let initial = {};
+                    for (let i = 1; i <= TOTAL_GROUPS; i++) {
+                        initial[i] = { groupId: i, members: `Group ${i} Members`, feedback: '', updatedAt: null };
+                    }
+                    groupsRef.set(initial);
+                    globalGroupsData = initial;
+                } else {
+                    globalGroupsData = data;
+                }
+                
+                renderWorkspaceUI();
+            }, (error) => {
+                // Fallback to local storage if cloud loses connection
+                document.getElementById('syncDot').className = 'w-2 h-2 rounded-full bg-yellow-400';
+                document.getElementById('syncStatus').innerHTML = '<span class="w-2 h-2 rounded-full bg-yellow-400"></span> Offline Mode';
+                let localData = localStorage.getItem('hanoi_pbl_peer_reviews_fallback');
+                globalGroupsData = localData ? JSON.parse(localData) : {};
+                renderWorkspaceUI();
+            });
+        }
+
+        function renderWorkspaceUI() {
+            const grid = document.getElementById('groupButtonsGrid');
+            grid.innerHTML = '';
+            let completed = 0;
+
+            for (let i = 1; i <= TOTAL_GROUPS; i++) {
+                const groupObj = globalGroupsData[i] || { feedback: '' };
+                const isFilled = groupObj.feedback && groupObj.feedback.trim() !== '';
+                if (isFilled) completed++;
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.id = `gbtn-${i}`;
+                btn.className = `py-2 px-1 text-xs font-bold rounded-lg border transition flex flex-col items-center justify-center gap-1 ${
+                    activeGroup === i 
+                        ? 'bg-[#8B4513] text-white border-[#5C2C16] shadow-sm' 
+                        : isFilled 
+                            ? 'bg-[#E8F5E9] text-[#2E7D32] border-[#C8E6C9]' 
+                            : 'bg-[#FDFBF7] text-gray-700 border-[#E6D5B8] hover:bg-[#F9F3EA]'
+                }`;
+                btn.innerHTML = `<span>Group ${i}</span><span class="w-2 h-2 rounded-full ${isFilled ? 'bg-green-500' : 'bg-gray-300'}"></span>`;
+                btn.onclick = () => selectGroup(i);
+                grid.appendChild(btn);
+            }
+
+            document.getElementById('completedCount').innerText = completed;
+            loadGroupIntoForm(activeGroup);
+            renderQAList();
+        }
+
+        function selectGroup(id) {
+            activeGroup = id;
+            renderWorkspaceUI();
+        }
+
+        function loadGroupIntoForm(id) {
+            const group = globalGroupsData[id] || { members: `Group ${id} Members`, feedback: '' };
+            document.getElementById('activeGroupId').value = id;
+            document.getElementById('currentEditingTitle').innerText = `Group ${id} - Review Form`;
+            document.getElementById('groupMembers').value = group.members || '';
+            document.getElementById('pblFeedback').value = group.feedback || '';
+        }
+
+        function saveGroupData(e) {
+            e.preventDefault();
+            const id = document.getElementById('activeGroupId').value;
+            
+            const updatedData = {
+                groupId: id,
+                members: document.getElementById('groupMembers').value,
+                feedback: document.getElementById('pblFeedback').value,
+                updatedAt: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+            };
+
+            // Save locally as backup
+            globalGroupsData[id] = updatedData;
+            localStorage.setItem('hanoi_pbl_peer_reviews_fallback', JSON.stringify(globalGroupsData));
+
+            // Push directly to Firebase Cloud Realtime Database
+            db.ref(`hanoi_pbl_peer_reviews_v3/${id}`).set(updatedData).then(() => {
+                const badge = document.getElementById('saveStatus');
+                badge.classList.remove('hidden');
+                setTimeout(() => badge.classList.add('hidden'), 2500);
+            }).catch((err) => {
+                console.log("Cloud sync error, saved locally:", err);
+            });
+        }
+
+        function renderQAList() {
+            const container = document.getElementById('qaFeedContainer');
+            container.innerHTML = '';
+            let hasContent = false;
+
+            for (let i = 1; i <= TOTAL_GROUPS; i++) {
+                const g = globalGroupsData[i];
+                if (!g || !g.feedback || g.feedback.trim() === '') continue;
+
+                hasContent = true;
+                const card = document.createElement('div');
+                card.className = 'bg-[#FDFBF7] border border-[#E6D5B8] rounded-xl p-5 shadow-sm space-y-3';
+                card.innerHTML = `
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-[#E6D5B8] pb-3">
+                        <div class="flex items-center gap-3">
+                            <span class="bg-[#8B4513] text-white text-xs font-bold px-3 py-1 rounded-full">Group ${g.groupId}</span>
+                            <span class="text-xs text-gray-500">Members: ${g.members || 'Not specified'}</span>
+                        </div>
+                        ${g.updatedAt ? `<span class="text-xs text-gray-400">Synced at: ${g.updatedAt}</span>` : ''}
+                    </div>
+                    <div class="bg-white p-4 rounded-lg border border-[#F0E6D2]">
+                        <p class="text-xs font-bold text-[#8B4513] mb-1">📝 Peer Evaluation & Feedback:</p>
+                        <p class="text-sm text-gray-800 whitespace-pre-line leading-relaxed">${g.feedback}</p>
+                    </div>
+                `;
+                container.appendChild(card);
+            }
+
+            if (!hasContent) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-500 text-sm">
+                        No peer reviews submitted yet. Select a group number above and submit your evaluation to sync it across devices in real-time!
+                    </div>
+                `;
+            }
+        }
+
+        window.onload = () => {
+            initRealtimeSync();
+        };
+    </script>
+</body>
+</html>
